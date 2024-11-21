@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Página de Pedidos - Amigo de Crochê</title>
+    <style>
+        body {
+            background-color: #F5F5DC;
+            /* Cor de fundo creme */
+        }
+
+        .btn-verde {
+            background-color: #556B2F;
+            /* Cor verde musgo para botões */
+            color: white;
+        }
+
+        .card-header {
+            background-color: #556B2F;
+            /* Cor verde musgo para cabeçalhos de card */
+            color: white;
+        }
+
+        .fixed-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+        }
+
+        .img-produto {
+            width: 100px;
+            /* Largura da imagem reduzida */
+            height: auto;
+            /* Altura automática para manter a proporção */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="../index.html">Minha Loja</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../index.html">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="carrinho.html">Carrinho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="perfil.html">Perfil</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>Página de Pedidos</h1>
+
+        <!-- Pedido 1: Urso de Crochê -->
+        <div class="card mb-3">
+            <div class="card-header">Pedido - Urso de Crochê</div>
+            <div class="card-body">
+                <img src="urso.jpg" alt="Urso de Crochê" class="img-produto mb-2">
+                <p><strong>Descrição:</strong> Urso de crochê feito à mão.</p>
+                <p><strong>Preço:</strong> R$ 40,00</p>
+                <p><strong>Status:</strong> Enviando</p>
+                <p><strong>Data Estimada de Chegada:</strong> 15/11/2024</p>
+                <p><strong>Rastreamento:</strong> ABC123456789</p>
+            </div>
+        </div>
+
+        <!-- Pedido 2: Coelho de Crochê -->
+        <div class="card mb-3">
+            <div class="card-header">Pedido - Coelho de Crochê</div>
+            <div class="card-body">
+                <img src="coelho.jfif" alt="Coelho de Crochê" class="img-produto mb-2">
+                <p><strong>Descrição:</strong> Coelho de crochê feito à mão.</p>
+                <p><strong>Preço:</strong> R$ 50,00</p>
+                <p><strong>Status:</strong> Enviando</p>
+                <p><strong>Data Estimada de Chegada:</strong> 17/11/2024</p>
+                <p><strong>Rastreamento:</strong> DEF987654321</p>
+            </div>
+        </div>
+
+        <!-- Botão para cancelar pedido -->
+        <button class="btn btn-verde fixed-bottom" id="cancelar-pedido">Cancelar Pedido</button>
+    </div>
+
+    <script>
+        function carregarPedidos() {
+            const container = document.querySelector('.container');
+            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            container.innerHTML = '<h1>Página de Pedidos</h1>'; // Limpa o conteúdo inicial
+
+            if (pedidos.length === 0) {
+                container.innerHTML += '<p>Nenhum pedido encontrado.</p>';
+                return;
+            }
+
+            pedidos.forEach((pedido, index) => {
+                container.innerHTML += `
+            <div class="card mb-3">
+                <div class="card-header">Pedido - ${pedido.name}</div>
+                <div class="card-body">
+                    <img src="${pedido.image}" alt="${pedido.name}" class="img-produto mb-2">
+                    <p><strong>Preço:</strong> R$ ${pedido.price.toFixed(2)}</p>
+                    <p><strong>Status:</strong> ${pedido.status}</p>
+                    <button class="btn btn-danger" onclick="cancelarPedido(${index})">Cancelar Pedido</button>
+                </div>
+            </div>`;
+            });
+        }
+
+        function cancelarPedido(index) {
+            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+            pedidos.splice(index, 1); // Remove o pedido pelo índice
+            localStorage.setItem('pedidos', JSON.stringify(pedidos)); // Atualiza o localStorage
+            alert('Pedido cancelado com sucesso.');
+            carregarPedidos(); // Atualiza a página
+        }
+
+        window.onload = carregarPedidos;
+    </script>
+     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ 
+
+</body>
+
+</html>

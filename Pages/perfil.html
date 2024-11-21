@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Perfil do Usuário - Amigo de Crochê</title>
+    <style>
+        body {
+            background-color: #F5F5DC; /* Cor de fundo creme */
+        }
+        .btn-verde {
+            background-color: #556B2F; /* Cor verde musgo para botões */
+            color: white;
+        }
+        .btn-vermelho {
+            background-color: #dc3545; /* Cor vermelha para o botão de sair */
+            color: white;
+        }
+        .card-header {
+            background-color: #556B2F; /* Cor verde musgo para cabeçalhos de card */
+            color: white;
+        }
+        .fixed-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 200px;
+        }
+        .img-produto {
+            width: 50px; /* Largura das imagens dos produtos na lista de desejos */
+            height: auto; /* Altura automática para manter a proporção */
+            margin-right: 10px; /* Espaçamento à direita da imagem */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="../index.html">Minha Loja</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../index.html">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="carrinho.html" onclick="goToCart()">Carrinho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="goToCart()">Perfil</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Perfil do Usuário</h1>
+        
+        <!-- Informações do Usuário -->
+        <div class="card mb-3">
+            <div class="card-header">Informações do Usuário</div>
+            <div class="card-body">
+                <p><strong>Nome de Usuário:</strong> <span id="usuario-nome">Carregando...</span></p>
+                <p><strong>Contato(email):</strong> <span id="usuario-endereco">Carregando...</span></p>
+            </div>
+        </div>
+
+        <!-- Lista de Desejos -->
+        <h2>Lista de Desejos</h2>
+        <ul class="list-group mb-3" id="wishlist">
+            <!-- Produtos serão adicionados dinamicamente aqui -->
+        </ul>
+
+        <!-- Menu de Configurações -->
+        <h3>Configurações</h3>
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Sair
+                <button class="btn btn-vermelho btn-sm" onclick="logout()">Sair</button>
+            </li>
+        </ul>
+
+        <!-- Botão fixo para acessar o carrinho -->
+        <a href="carrinho.html"><button class="btn btn-verde fixed-bottom" id="carrinho">Acessar Carrinho de Compras</button></a>
+    </div>
+
+    <script>
+        // Função para buscar informações do usuário
+        function carregarInformacoesUsuario() {
+            const email = localStorage.getItem('loggedUser');
+            if (!email) {
+                alert('Você precisa estar logado para acessar o perfil.');
+                window.location.href = 'login.html'; // Redireciona para a página de login se não estiver logado
+                return;
+            }
+
+            const usuario = JSON.parse(localStorage.getItem(email));
+
+            if (usuario) {
+                document.getElementById('usuario-nome').textContent = usuario.nome;
+                document.getElementById('usuario-endereco').textContent = usuario.email;
+            } else {
+                document.getElementById('usuario-nome').textContent = 'Informações não encontradas';
+                document.getElementById('usuario-endereco').textContent = 'Informações não encontradas';
+            }
+        }
+
+        // Função para sair (limpar o login do localStorage)
+        function logout() {
+            localStorage.removeItem('loggedUser');
+            alert('Você saiu com sucesso!');
+            window.location.href = '../index.html'; // Redireciona para a página de login
+        }
+
+        // Função para carregar a lista de desejos
+        function carregarListaDeDesejos() {
+            const wishlistElement = document.getElementById('wishlist');
+            const produtos = [];
+
+            // Iterar sobre os itens no localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.endsWith('Data')) {
+                    const item = JSON.parse(localStorage.getItem(key));
+                    const quantidadeKey = key.replace('Data', 'Qty');
+                    const quantidade = localStorage.getItem(quantidadeKey) || 1;
+
+                    produtos.push({
+                        nome: item.name,
+                        preco: item.price * quantidade,
+                        imagem: item.image,
+                        quantidade
+                    });
+                }
+            }
+
+            // Adicionar itens na lista de desejos
+            if (produtos.length > 0) {
+                produtos.forEach(produto => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex align-items-center';
+                    listItem.innerHTML = `
+                        <img src="../${produto.imagem}" alt="${produto.nome}" class="img-produto">
+                        ${produto.nome} - R$ ${produto.preco.toFixed(2)} (${produto.quantidade}x)
+                    `;
+                    wishlistElement.appendChild(listItem);
+                });
+            } else {
+                wishlistElement.innerHTML = '<li class="list-group-item">Sua lista de desejos está vazia.</li>';
+            }
+        }
+
+        // Carregar as informações do usuário e a lista de desejos quando a página for carregada
+        window.onload = function() {
+            carregarInformacoesUsuario();
+            carregarListaDeDesejos();
+        };
+    </script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

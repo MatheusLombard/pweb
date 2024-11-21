@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Compra</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #F7EEE9;
+        }
+
+        .btn-custom {
+            background-color: #9FB599;
+            color: white;
+        }
+
+        .fixed-bottom {
+            background-color: #F7EEE9;
+            padding: 10px;
+        }
+
+        .collapse {
+            margin-top: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f6f5d7;
+        }
+
+        .cart-item img {
+            width: 100px;
+            /* Tamanho da imagem aumentado para 100px */
+            margin-right: 10px;
+        }
+
+        .cart-item-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            /* Alinhamento central */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="../index.html">Minha Loja</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../index.html">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="carrinho.html">Carrinho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="perfil.html">Perfil</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1 class="text-center">Confirmação de Compra</h1>
+
+        <!-- Itens da compra -->
+        <ul class="list-group mb-4" id="cart-items"></ul>
+
+        <!-- Endereço de entrega -->
+        <h4>Endereço de Entrega:</h4>
+        <button class='btn btn-custom' data-toggle='collapse' data-target='#address-form'>Inserir Endereço</button>
+
+        <form id='address-form' class='collapse'>
+            <input type='text' id='cep' placeholder='CEP (apenas números)' onblur='fetchAddress()' pattern="\d{5}-\d{3}"
+                required class='form-control mb-2'>
+            <input type='text' id='rua' placeholder='Rua' class='form-control mb-2' required>
+            <input type='text' id='bairro' placeholder='Bairro' class='form-control mb-2' required>
+            <input type='text' id='cidade' placeholder='Cidade' class='form-control mb-2' required>
+            <input type='text' id='estado' placeholder='Estado' class='form-control mb-2' required>
+            <input type='text' id='numero' placeholder='Número da Casa/Apartamento' class='form-control mb-2' required>
+        </form>
+
+        <!-- Forma de pagamento -->
+        <h4>Forma de Pagamento:</h4>
+        <button class='btn btn-custom' data-toggle='collapse' data-target='#payment-methods'>Selecionar Forma de
+            Pagamento</button>
+
+        <!-- Métodos de pagamento -->
+        <div id='payment-methods' class='collapse'>
+            <select id='payment-method' class='form-control mb-2'>
+                <option value="">Selecione...</option>
+                <option value="pix">Pix</option>
+                <option value="credit-card">Cartão de Crédito</option>
+                <option value="debit-card">Cartão de Débito</option>
+            </select>
+
+            <!-- Dados do cartão -->
+            <div id='card-details' style='display:none;'>
+                <input type='text' placeholder='Número do Cartão' id='card-number' class='form-control mb-2'>
+                <!-- Data de vencimento -->
+                <input type="text" placeholder="Data de Vencimento (mm/aa)" id="expiration-date"
+                    class="form-control mb-2" required>
+                <!-- CVV -->
+                <input type="text" placeholder="CVV" id="cvv" class="form-control mb-2" required>
+                <!-- Parcelamento -->
+                <select id='installments' class='form-control mb-2'></select>
+            </div>
+        </div>
+
+        <!-- Valores Totais -->
+        <h4>Resumo da Compra:</h4>
+        Total dos Produtos: R$ <span id="total-products">0.00</span><br>
+        Frete: R$ 15,00<br>
+        Total da Compra: R$ <span id="total-purchase">0.00</span><br>
+
+        <!-- Botão para finalizar compra -->
+        <div class='fixed-bottom text-center'>
+            <button id="finalizar-compra" class="btn btn-custom">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <script>
+        // Função para preencher a lista de itens no carrinho
+        function populateCartItems() {
+            const cartList = document.getElementById('cart-items');
+            let totalPrice = 0;
+
+            // Iterar sobre todos os itens armazenados no localStorage
+            for (let i = 0; i <= localStorage.length; i++) {
+                const itemKey = localStorage.key(i);
+                if (itemKey && itemKey.endsWith("Data")) { // Verifica se é um dado do produto
+                    const itemData = JSON.parse(localStorage.getItem(itemKey));
+                    const quantityKey = itemKey.replace("Data", "Qty");
+                    const itemQuantity = localStorage.getItem(quantityKey) || 1;
+
+                    const itemTotal = itemData.price * itemQuantity;
+                    totalPrice += itemTotal;
+
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item cart-item';
+                    listItem.innerHTML = `
+               <div class="cart-item-details">
+                   <img src="../${itemData.image}" alt="${itemData.name}">
+                   ${itemData.name}
+                   <span>R$ ${itemTotal.toFixed(2)} (${itemData.price.toFixed(2)} x ${itemQuantity})</span>
+               </div>`;
+
+                    cartList.appendChild(listItem);
+                }
+            }
+
+            // Atualizar valores totais
+            document.getElementById('total-products').textContent = totalPrice.toFixed(2);
+            document.getElementById('total-purchase').textContent = (totalPrice + 15).toFixed(2); // Adicionando frete
+
+            // Verificar se o carrinho está vazio
+            if (totalPrice === 0) {
+                alert("Seu carrinho está vazio.");
+                window.location.href = "carrinho.html"; // Redirecionar para o carrinho se estiver vazio
+            }
+        }
+
+        // Exibir detalhes do cartão ao selecionar forma de pagamento
+        document.getElementById('payment-method').addEventListener('change', function () {
+            const cardDetails = document.getElementById('card-details');
+            cardDetails.style.display = this.value === 'credit-card' || this.value === 'debit-card' ? 'block' : 'none';
+
+            // Calcular parcelas se for cartão de crédito
+            if (this.value === 'credit-card') {
+                calculateInstallments();
+            } else {
+                document.getElementById('installments').innerHTML = ''; // Limpar opções se não for crédito
+            }
+        });
+
+        // Função para buscar endereço automaticamente
+        async function fetchAddress() {
+            const cep = document.getElementById('cep').value.replace('-', '');
+            if (cep.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await response.json();
+                    if (!data.erro) {
+                        document.getElementById('rua').value = data.logradouro;
+                        document.getElementById('bairro').value = data.bairro;
+                        document.getElementById('cidade').value = data.localidade;
+                        document.getElementById('estado').value = data.uf;
+                    } else {
+                        alert("CEP não encontrado.");
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar o CEP:", error);
+                }
+            }
+        }
+
+        // Calcular parcelas disponíveis
+        function calculateInstallments() {
+            const totalProducts = parseFloat(document.getElementById('total-products').textContent);
+            const maxInstallments = Math.floor(totalProducts / 10); // Mínimo R$10 por parcela
+
+            const installmentsSelect = document.getElementById('installments');
+            installmentsSelect.innerHTML = ''; // Limpar opções anteriores
+
+            for (let i = 1; i <= Math.min(maxInstallments, 12); i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${i}x - R$ ${(totalProducts / i).toFixed(2)} por parcela`;
+                installmentsSelect.appendChild(option);
+            }
+        }
+
+        function carregarPedidoSelecionado() {
+            const pedido = JSON.parse(localStorage.getItem("pedidoSelecionado"));
+            if (pedido) {
+                const cartList = document.getElementById('cart-items');
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item cart-item';
+                listItem.innerHTML = `
+                <div class="cart-item-details">
+                    <span><strong>Produto:</strong> ${pedido.name}</span>
+                    <span><strong>Preço:</strong> R$ ${pedido.price.toFixed(2)}</span>
+                    <span><strong>Rastreamento:</strong> ${pedido.tracking}</span>
+                </div>
+            `;
+                cartList.appendChild(listItem);
+
+                // Atualizar valores totais
+                document.getElementById('total-products').textContent = pedido.price.toFixed(2);
+                document.getElementById('total-purchase').textContent = (pedido.price + 15).toFixed(2);
+            }
+        }
+        document.getElementById('finalizar-compra').onclick = function () {
+            // Verificar se há itens no carrinho
+            const cartList = document.querySelectorAll('#cart-items .cart-item');
+            if (cartList.length === 0) {
+                alert('Carrinho vazio. Não é possível finalizar a compra.');
+                return;
+            }
+
+            // Obter os pedidos existentes no localStorage
+            const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+
+            // Criar novo pedido a partir do carrinho
+            cartList.forEach(item => {
+                const name = item.querySelector('.cart-item-details').textContent.trim();
+                const priceText = item.querySelector('.cart-item-details span').textContent;
+                const price = parseFloat(priceText.match(/([\d.,]+)/)[1].replace(',', '.')); // Extrair preço
+                const image = item.querySelector('img').src; // Obter imagem do produto
+
+                const novoPedido = {
+                    name,
+                    price,
+                    image,
+                    status: 'Pendente'
+                };
+
+                pedidos.push(novoPedido);
+            });
+
+            // Salvar pedidos no localStorage
+            localStorage.setItem('pedidos', JSON.stringify(pedidos));
+
+            // Limpar o carrinho (localStorage)
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.endsWith("Data")) { // Verifica se é um dado do produto
+                    localStorage.removeItem(key);
+                    const quantityKey = key.replace("Data", "Qty");
+                    localStorage.removeItem(quantityKey);
+                }
+            }
+
+            // Exibir mensagem e redirecionar
+            alert('Compra finalizada com sucesso!');
+            window.location.href = 'pedidos.html'; // Redireciona para a página de pedidos
+        };
+
+        // Preencher itens ao carregar a página
+        window.onload = function () {
+            populateCartItems(); // Original
+            carregarPedidoSelecionado(); // Adicionada
+        };
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

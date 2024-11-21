@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #F7EEE9;
+        }
+
+        .btn-custom {
+            background-color: #9FB599;
+            color: white;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .product-card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Minha Loja</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../index.html">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="goToCart()">Carrinho</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="checkLogin()">Perfil</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Bem-vindo à Nossa Loja!</h1>
+
+        <!-- Produtos -->
+        <div class="row mt-5">
+
+            <!-- Produto 1 -->
+            <div class="col-md-4 product-card">
+                <div class="card text-center">
+                    <!-- Substitua esses dados com os reais -->
+                    <img src="./images/ursinho.png" alt="Ursinho de Pelúcia" class="card-img-top">
+                    <div class="card-body">
+                        <h5>Ursinho de Pelúcia</h5>
+                        <p>R$ 49.90</p>
+                        <button class="btn btn-custom"
+                            onclick='addToCart("ursinho", "./images/ursinho.png", "Ursinho de Pelúcia", 49.90)'>Adicionar
+                            ao Carrinho</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 2 -->
+            <div class="col-md-4 product-card">
+                <div class="card text-center">
+                    <!-- Substitua esses dados com os reais -->
+                    <img src="./images/polvo.png" alt="Polvo de Pelúcia" class="card-img-top">
+                    <div class="card-body">
+                        <h5>Polvo de Pelúcia</h5>
+                        <p>R$ 59.90</p>
+                        <button class="btn btn-custom"
+                            onclick='addToCart("polvo", "./images/polvo.png", "Polvo de Pelúcia", 59.90)'>Adicionar ao
+                            Carrinho</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 3: Suéter de Tricô -->
+            <div class="col-md-4 product-card">
+                <div class="card text-center">
+                    <!-- Substitua esses dados com os reais -->
+                    <img src="./images/suetertrico.png" alt="Suéter de Tricô" class="card-img-top">
+                    <div class="card-body">
+                        <h5>Suéter de Tricô</h5>
+                        <p>R$ 99.90</p>
+                        <button class="btn btn-custom"
+                            onclick='addToCart("sueter-trico", "./images/suetertrico.png", "Suéter de Tricô", 99.90)'>Adicionar
+                            ao Carrinho</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produto 4: Ursinho de Pelúcia Maior -->
+            <div class="col-md-4 product-card">
+                <div class="card text-center">
+                    <!-- Substitua esses dados com os reais -->
+                    <img src="./images/ursomaior.png" alt="Ursinho de Pelúcia Maior" class="card-img-top">
+                    <div class="card-body">
+                        <h5>Ursinho de Pelúcia Maior</h5>
+                        <p>R$ 149.90</p>
+                        <button class="btn btn-custom"
+                            onclick='addToCart("ursinho-maior", "./images/ursomaior.png", "Ursinho de Pelúcia Maior", 149.90)'>Adicionar
+                            ao Carrinho</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Função para adicionar produtos ao carrinho e redirecionar
+        function addToCart(item, image, name, price) {
+            let currentQty = localStorage.getItem(`${item}Qty`) ? parseInt(localStorage.getItem(`${item}Qty`)) : 0;
+            localStorage.setItem(`${item}Qty`, currentQty + 1);
+
+            const productData = {
+                image: image,
+                name: name,
+                price: price
+            };
+
+            localStorage.setItem(`${item}Data`, JSON.stringify(productData));
+
+            alert(`${name} foi adicionado ao carrinho!`);
+            window.location.href = "./Pages/carrinho.html"; // Redireciona para a página do carrinho
+        }
+
+        // Função para ir para a página do carrinho
+        function goToCart() {
+            window.location.href = "./Pages/carrinho.html"; // Altere para o caminho correto da sua página de carrinho
+        }
+
+        // Função para verificar se o usuário está logado
+        function checkLogin() {
+            // Verifica se existe um item no localStorage que indique que o usuário está logado
+            let isLoggedIn = localStorage.getItem("loggedUser");
+
+            if (isLoggedIn) {
+                // Se o usuário estiver logado, vai para a página de perfil
+                window.location.href = "./Pages/perfil.html";
+            } else {
+                // Se não estiver logado, pergunta se ele deseja fazer login
+                let userWantsToLogin = confirm("Você não está logado. Deseja realizar o login?");
+
+                if (userWantsToLogin) {
+                    // Se o usuário escolher "Sim", redireciona para a página de login
+                    window.location.href = "./Pages/login.html";
+                } else {
+                    // Se escolher "Não", redireciona para o índice
+                    window.location.href = "../index.html";
+                }
+            }
+        }
+    </script>
+
+    <script src="//code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="//stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
